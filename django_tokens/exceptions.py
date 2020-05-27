@@ -1,0 +1,2 @@
+class ObjectAlreadyUsed(Exception):
+    pass
