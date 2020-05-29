@@ -7,7 +7,6 @@ from django.utils.crypto import get_random_string
 
 from .exceptions import ObjectAlreadyUsed
 from .settings import settings, default_settings, setting
-from .utils import classproperty
 
 
 class HMACToken:
@@ -74,7 +73,7 @@ class HMACToken:
         used: raise HMACToken.DoesNotExist.
         """
         try:
-            data = signing.loads(key, max_age=cls._max_age, salt=cls._salt)
+            data = signing.loads(key, max_age=cls.get_max_age(), salt=cls.get_salt())
             self = cls(**data)
             self.check_validity()
         except (TypeError, ObjectAlreadyUsed,
@@ -88,9 +87,9 @@ class HMACToken:
     def key(self):
         return signing.dumps(
             obj=self._data,
-            salt=self._salt,
-            serializer=self._serializer,
-            compress=self._compress
+            salt=self.get_salt(),
+            serializer=self.get_serializer(),
+            compress=self.get_compress()
         )
 
     def check_validity(self):
@@ -99,16 +98,16 @@ class HMACToken:
             f"'check_validity' method not overridden for {cls_name}. "
             f"Tokens will not be single use.")
 
-    @classproperty
-    def _serializer(cls):
+    @classmethod
+    def get_serializer(cls):
         return setting(cls.serializer, settings.HMAC_TOKEN_SERIALIZER)
 
-    @classproperty
-    def _compress(cls):
+    @classmethod
+    def get_compress(cls):
         return setting(cls.compress, settings.HMAC_TOKEN_COMPRESS)
 
-    @classproperty
-    def _salt(cls):
+    @classmethod
+    def get_salt(cls):
         salt = setting(cls.salt, settings.HMAC_TOKEN_SALT)
         if salt == default_settings.HMAC_TOKEN_SALT:
             warnings.warn(
@@ -117,8 +116,8 @@ class HMACToken:
              )
         return salt
 
-    @classproperty
-    def _max_age(cls):
+    @classmethod
+    def get_max_age(cls):
         return setting(cls.max_age, settings.HMAC_TOKEN_MAX_AGE)
 
 
@@ -163,29 +162,29 @@ class CacheToken:
 
     @classmethod
     def from_key(cls, key):
-        data = cls._cache.get(key, None)
+        data = cls.get_cache().get(key, None)
         if data is None:
             raise cls.DoesNotExist
         else:
-            cls._cache.delete(key)
+            cls.get_cache().delete(key)
             return cls(**data)
 
     @property
     def key(self):
         if not self._key:
-            self._key = get_random_string(length=self._key_length)
-            self._cache.set(self._key, self._data, timeout=self._max_age)
+            self._key = get_random_string(length=self.get_key_length())
+            self.get_cache().set(self._key, self._data, timeout=self.get_max_age())
         return self._key
 
-    @classproperty
-    def _cache(cls):
+    @classmethod
+    def get_cache(cls):
         cache_name = setting(cls.cache_name, settings.CACHE_TOKEN_CACHE_NAME)
         return caches[cache_name]
 
-    @classproperty
-    def _key_length(cls):
+    @classmethod
+    def get_key_length(cls):
         return setting(cls.key_length, settings.CACHE_TOKEN_KEY_LENGTH)
 
-    @classproperty
-    def _max_age(cls):
+    @classmethod
+    def get_max_age(cls):
         return setting(cls.max_age, settings.CACHE_TOKEN_MAX_AGE)

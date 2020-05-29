@@ -43,14 +43,14 @@ class HMACTokenTestCase(TestCase):
 
     def test_settings_priority(self):
         # First we check the default setting:
-        self.assertEqual(TestHMACToken._max_age, 300)
+        self.assertEqual(TestHMACToken.get_max_age(), 300)
 
         # The we apply user provided django settings
         with self.settings(HMAC_TOKEN_MAX_AGE=120, HMAC_TOKEN_SALT='hej'):
-            self.assertEqual(TestHMACToken._max_age, 120)
+            self.assertEqual(TestHMACToken.get_max_age(), 120)
 
             # Which are still overriden by class attributes
-            self.assertEqual(TestHMACToken._salt, 'test')
+            self.assertEqual(TestHMACToken.get_salt(), 'test')
 
     def test_invalid_key(self):
         key = 'invalid'
@@ -119,14 +119,14 @@ class CacheTokenTestCase(TestCase):
 
     def test_settings_priority(self):
         # First we check the default setting:
-        self.assertEqual(TestCacheToken._max_age, 300)
+        self.assertEqual(TestCacheToken.get_max_age(), 300)
 
         # The we apply user provided django settings
         with self.settings(CACHE_TOKEN_MAX_AGE=120, CACHE_TOKEN_KEY_LENGTH=10):
-            self.assertEqual(TestCacheToken._max_age, 120)
+            self.assertEqual(TestCacheToken.get_max_age(), 120)
 
             # Which are still overriden by class attributes
-            self.assertEqual(TestCacheToken._key_length, 10)
+            self.assertEqual(TestCacheToken.get_key_length(), 10)
 
     def test_invalid_key(self):
         key = 'invalid'
