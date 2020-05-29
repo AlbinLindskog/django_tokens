@@ -37,8 +37,8 @@ Settings
 ^^^^^^^^
 Django Tokens contains two types of Tokens, stateless HMACTokens and stateful
 CacheTokens, each type have their own settings. The settings can be set either
-as class level attributes or through Django settings, where the former takes
-precedence over the latter.
+as class attributes directly on your subclass, or globally or through Django
+settings, where the former takes precedence over the latter.
 
 HMACToken
 ~~~~~~~~~~
