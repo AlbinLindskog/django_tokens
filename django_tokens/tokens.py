@@ -56,6 +56,9 @@ class HMACToken:
         """
         If an attribute does not exist on this instance, we also attempt to
         retrieve it from the underlying data store.
+
+        We could achieve the same effect by just adding data to self.__dict__
+        in the __init__ method, but this is cleaner, imo.
         """
         try:
             return self._data[attr]
@@ -158,6 +161,9 @@ class CacheToken:
         """
         If an attribute does not exist on this instance, we also attempt to
         retrieve it from the underlying data store.
+
+        We could achieve the same effect by just adding data to self.__dict__
+        in the __init__ method, but this is cleaner, imo.
         """
         try:
             return self._data[attr]
