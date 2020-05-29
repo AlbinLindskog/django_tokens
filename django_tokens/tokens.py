@@ -50,6 +50,11 @@ class HMACToken:
     max_age = None
 
     def __init__(self, **data):
+        """
+        Every key-value pair in data will be available as attributes of the
+        token. Any attributes other set in the __init__ method will not be
+        available when the token is recreated from its key.
+        """
         self._data = data
 
     def __getattr__(self, attr):
@@ -57,8 +62,11 @@ class HMACToken:
         If an attribute does not exist on this instance, we also attempt to
         retrieve it from the underlying data store.
 
-        We could achieve the same effect by just adding data to self.__dict__
-        in the __init__ method, but this is cleaner, imo.
+        This approach creates nontransparent AttributeErrors in @properties,
+        but it is preferable to the alternative; adding data to self.__dict__
+        to dynamically set the attributes, as that leads to all attributes
+        on the instance being stored when creating the key, not just those
+        explicitly passed as data.
         """
         try:
             return self._data[attr]
@@ -152,18 +160,26 @@ class CacheToken:
     cache_name = None
     key_length = None
     max_age = None
+    _key = None
 
     def __init__(self, **data):
+        """
+        Every key-value pair in data will be available as attributes of the
+        token. Any attributes other set in the __init__ method will not be
+        available when the token is recreated from its key.
+        """
         self._data = data
-        self._key = None
 
     def __getattr__(self, attr):
         """
         If an attribute does not exist on this instance, we also attempt to
         retrieve it from the underlying data store.
 
-        We could achieve the same effect by just adding data to self.__dict__
-        in the __init__ method, but this is cleaner, imo.
+        This approach creates nontransparent AttributeErrors in @properties,
+        but it is preferable to the alternative; adding data to self.__dict__
+        to dynamically set the attributes, as that leads to all attributes
+        on the instance being stored when creating the key, not just those
+        explicitly passed as data.
         """
         try:
             return self._data[attr]
