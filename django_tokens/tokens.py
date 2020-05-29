@@ -20,7 +20,8 @@ class HMACToken:
 
     Note:
         In order for HMACTokens to be single use you must subclass it and
-        override the check_data to check if you have already acted on it.
+        override the check_validity method to check if you have already acted
+        on it. Raise self.AlreadyUsed if you have already acted on the token.
         How to implement that check will depend on your use case. In a single
         use login token you could include a last login timestamp in the token
         data and compare it the users current last login, for example.
@@ -74,13 +75,14 @@ class HMACToken:
         """
         try:
             data = signing.loads(key, max_age=cls._max_age, salt=cls._salt)
-            data = cls.check_data(data)
+            self = cls(**data)
+            self.check_validity()
         except (TypeError, ObjectAlreadyUsed,
                 signing.SignatureExpired,
                 signing.BadSignature) as e:
             raise cls.DoesNotExist from e
         else:
-            return HMACToken(**data)
+            return self
 
     @property
     def key(self):
@@ -91,12 +93,11 @@ class HMACToken:
             compress=self._compress
         )
 
-    @classmethod
-    def check_data(cls, data):
+    def check_validity(self):
+        cls_name = self.__class__.__name__
         warnings.warn(
-            f"'check_data' method not overridden for {cls.__name__}. "
+            f"'check_validity' method not overridden for {cls_name}. "
             f"Tokens will not be single use.")
-        return data
 
     @classproperty
     def _serializer(cls):

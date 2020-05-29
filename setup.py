@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='Django tokens',
-    version='0.0.1',
+    version='0.0.2',
     description='Tokens used to safely pass data through an untrusted medium.',
     long_description=open('README.rst').read(),
     install_requires=[],

@@ -6,22 +6,19 @@ from django_tokens import HMACToken, CacheToken
 class TestHMACToken(HMACToken):
     salt = 'test'
 
-    @classmethod
-    def check_data(cls, data):
-        return data
+    def check_validity(self):
+        pass
 
 
 class SingleUseTestHMACToken(HMACToken):
     salt = 'single-use'
     used = False
 
-    @classmethod
-    def check_data(cls, data):
-        if cls.used:
-            raise cls.AlreadyUsed
+    def check_validity(self):
+        if SingleUseTestHMACToken.used:
+            raise self.AlreadyUsed
         else:
-            cls.used = True
-        return data
+            SingleUseTestHMACToken.used = True
 
 
 class TestCacheToken(CacheToken):
@@ -69,10 +66,10 @@ class HMACTokenTestCase(TestCase):
             with self.assertRaises(TestHMACToken.DoesNotExist):
                 TestHMACToken.from_key(key)
 
-    def test_single_use_with_check_data_override(self):
+    def test_single_use_with_check_validity_override(self):
         """
         Ensure that it is possible to create single user HMACTokens by
-        overriding check_data.
+        overriding check_validity.
         """
         key = SingleUseTestHMACToken(email='hej@mail.com').key
 
@@ -98,7 +95,7 @@ class HMACTokenTestCase(TestCase):
             re_token = HMACToken.from_key(key)
         self.assertEqual(
             str(cm.warnings[1].message),
-            "'check_data' method not overridden for HMACToken. "
+            "'check_validity' method not overridden for HMACToken. "
             "Tokens will not be single use."
         )
 
