@@ -73,8 +73,14 @@ class HMACToken:
         used: raise HMACToken.DoesNotExist.
         """
         try:
-            data = signing.loads(key, max_age=cls.get_max_age(), salt=cls.get_salt())
-            self = cls(**data)
+            data = signing.loads(
+                key, max_age=cls.get_max_age(), salt=cls.get_salt()
+            )
+            # Initialize without calling __init__ to allow subclasses of
+            # HMACToken to have custom __init__ call signature.
+            self = self = cls.__new__(cls)
+            self._data = data
+
             self.check_validity()
         except (TypeError, ObjectAlreadyUsed,
                 signing.SignatureExpired,
@@ -167,7 +173,11 @@ class CacheToken:
             raise cls.DoesNotExist
         else:
             cls.get_cache().delete(key)
-            return cls(**data)
+            # Initialize without calling __init__ to allow subclasses of
+            # CacheToken to have custom __init__ call signature.
+            self = cls.__new__(cls)
+            self._data = data
+            return self
 
     @property
     def key(self):

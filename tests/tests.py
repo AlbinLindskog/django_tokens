@@ -21,8 +21,40 @@ class SingleUseTestHMACToken(HMACToken):
             SingleUseTestHMACToken.used = True
 
 
+class CustomInitHMACToken(HMACToken):
+    """
+    Here we just reverse the input, it's a stand-in for some more complex data
+    handling, .e.g. storing a database id and the fetching it from the database
+    once the token has been recreated.
+    """
+    salt = 'custom-init'
+
+    def __init__(self, *, username):
+        super().__init__(rev=username[::-1])
+
+    @property
+    def username(self):
+        return self.rev[::-1]
+
+    def check_validity(self):
+        pass
+
+
 class TestCacheToken(CacheToken):
     key_length = 10
+
+
+class CustomInitCacheToken(CacheToken):
+    """
+    See CustomInitHMACToken.
+    """
+
+    def __init__(self, *, username):
+        super().__init__(rev=username[::-1])
+
+    @property
+    def username(self):
+        return self.rev[::-1]
 
 
 class HMACTokenTestCase(TestCase):
@@ -99,6 +131,17 @@ class HMACTokenTestCase(TestCase):
             "Tokens will not be single use."
         )
 
+    def test_custom_init_methods(self):
+        """
+        Make sure we can still recreate the token when you subclass it and
+        write a custom __init__ method.
+        """
+        username = 'dharoc'
+        key = CustomInitHMACToken(username=username).key
+        token = CustomInitHMACToken.from_key(key)
+        self.assertEqual(token.username, username)
+        self.assertEqual(token.rev, username[::-1])
+
 
 class CacheTokenTestCase(TestCase):
 
@@ -148,3 +191,14 @@ class CacheTokenTestCase(TestCase):
         token = TestCacheToken.from_key(key)
         with self.assertRaises(TestCacheToken.DoesNotExist):
             token = TestCacheToken.from_key(key)
+
+    def test_custom_init_methods(self):
+        """
+        Make sure we can still recreate the token when you subclass it and
+        write a custom __init__ method.
+        """
+        username = 'dharoc'
+        key = CustomInitCacheToken(username=username).key
+        token = CustomInitCacheToken.from_key(key)
+        self.assertEqual(token.username, username)
+        self.assertEqual(token.rev, username[::-1])
