@@ -25,6 +25,14 @@ An altered key or one that's already been used are invalid.::
     ... django.core.exceptions.ObjectDoesNotExist
 
 
+It is recommended that you create a subclass of the tokens with a explicit
+name for each use case you have.
+
+When defining a subclass with a specific __init__ call signature; all kwargs
+passed to the parent's class __init__ method will be available as attributes
+on the instance. Any attributes set in the __init__ method will not be
+available when the token is recreated from its key.
+
 Settings
 ^^^^^^^^
 Django Tokens contains two types of Tokens, stateless HMACTokens and stateful

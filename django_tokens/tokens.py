@@ -9,7 +9,14 @@ from .exceptions import ObjectAlreadyUsed
 from .settings import settings, default_settings, setting
 
 
-class HMACToken:
+class Token:
+    """
+    Abstract base class for all tokens.
+    """
+    pass
+
+
+class HMACToken(Token):
     """
     Stateless token used to safely pass data through an untrusted medium,
     i.e. the user.
@@ -138,7 +145,7 @@ class HMACToken:
         return setting(cls.max_age, settings.HMAC_TOKEN_MAX_AGE)
 
 
-class CacheToken:
+class CacheToken(Token):
     """
     Statefull token used to safely pass data through an untrusted medium,
     i.e. the user.
