@@ -3,7 +3,6 @@ from django.utils.module_loading import import_string
 
 
 class DEFAULTS:
-    HMAC_TOKEN_SERIALIZER = 'django.core.signing.JSONSerializer'
     HMAC_TOKEN_COMPRESS = False
     HMAC_TOKEN_SALT = 'django_tokens.salt'
     HMAC_TOKEN_MAX_AGE = 300

@@ -3,6 +3,7 @@ import warnings
 from django.core import signing
 from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.signing import JSONSerializer
 from django.utils.crypto import get_random_string
 
 from .exceptions import ObjectAlreadyUsed
@@ -34,25 +35,25 @@ class HMACToken(Token):
 
     Attributes:
         salt (str): Salt used in the signature. Defaults to
-            'django_tokens.salt'. Leaving this as the default or using the same
-            salt for different applications of HMACTokens is a security risk.
-
-        serializer (str): Import string of serializer class to use to serialize
-            the provided data. Default: 'django.core.signing.JSONSerializer'.
-            Custom serializers must define the  must define the 'dumps' and
-            'loads' methods.
-
-        compress (bool): Denotes whether to try and compress the data using
-            zlib, defaults to False.
+            settings.HMAC_TOKEN_SALT. Leaving this as the default or using the
+            same salt for different applications of HMACTokens is a security
+            risk.
 
         max_age (int): The lifetime of the token in seconds before its key
-            becomes invalid. The default is 300, i.e. 5 minutes.
+            becomes invalid. The default is settings.HMAC_TOKEN_MAX_AGE.
+
+        compress (bool): Denotes whether to try and compress the data using
+            zlib, defaults to settings.HMAC_TOKEN_COMPRESS.
+
+        serializer (str): Class used to serialize the provided data. Default:
+            'django.core.signing.JSONSerializer'. Custom serializer classes
+            define the  must define the 'dumps' and 'loads' methods.
     """
 
     AlreadyUsed = ObjectAlreadyUsed
     DoesNotExist = ObjectDoesNotExist
+    serializer = JSONSerializer
     salt = None
-    serializer = None
     compress = None
     max_age = None
 

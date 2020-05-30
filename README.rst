@@ -47,17 +47,12 @@ HMACToken.salt or settings.HMAC_TOKEN_SALT (str):
     as the default or using the same salt for different applications of
     HMACTokens is a security risk.
 
-MHACToken.serializer or settings.HMAC_TOKEN_SERIALISER (str):
-    Import string of serializer class to use to serialize the provided data.
-    The default is 'django.core.signing.JSONSerializer'. Custom serializers
-    must define the 'dumps' and 'loads' methods.
-
-MHACToken.compress or settings.HMAC_TOKEN_COMPRESS (bool):
-    Denotes whether to try and compress the data using zlib, defaults to False.
-
 MHACToken.max_age or settings.HMAC_TOKEN_MAX_AGE (int):
     The lifetime of the token in seconds before its key becomes invalid. The
     default is 300, i.e. 5 minutes.
+
+MHACToken.compress or settings.HMAC_TOKEN_COMPRESS (bool):
+    Denotes whether to try and compress the data using zlib, defaults to False.
 
 CacheTokens
 ~~~~~~~~~~
